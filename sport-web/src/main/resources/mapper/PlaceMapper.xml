@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fc.sport.mapper.PlaceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fc.sport.entity.Place">
+        <result column="id" property="id" />
+        <result column="is_deleted" property="deleted" />
+        <result column="creator" property="creator" />
+        <result column="modifier" property="modifier" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="position" property="position" />
+        <result column="type" property="type" />
+        <result column="plan_pic" property="planPic" />
+        <result column="brief" property="brief" />
+        <result column="facs_dict" property="facsDict" />
+        <result column="phone" property="phone" />
+        <result column="tel" property="tel" />
+        <result column="is_open" property="open" />
+        <result column="max_day" property="maxDay" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        is_deleted,
+        creator,
+        modifier,
+        create_time,
+        modify_time,
+        code, name, position, type, plan_pic, brief, facs_dict, phone, tel, is_open, max_day, start_time, end_time
+    </sql>
+
+    <!-- 根据场地Code直接查询，跳过软删除 -->
+    <select id="getByCodePro" resultType="com.fc.sport.entity.Place">
+        SELECT *
+        FROM `fc_place`
+        WHERE code = #{code}
+    </select>
+
+    <!-- 恢复软删除 -->
+    <update id="recoverDeleted">
+        UPDATE `fc_place`
+        SET is_deleted = 0
+        WHERE id = #{id}
+    </update>
+
+</mapper>

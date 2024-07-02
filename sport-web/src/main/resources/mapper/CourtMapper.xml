@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fc.sport.mapper.CourtMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fc.sport.entity.Court">
+        <result column="id" property="id" />
+        <result column="is_deleted" property="deleted" />
+        <result column="creator" property="creator" />
+        <result column="modifier" property="modifier" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="place_id" property="placeId" />
+        <result column="name" property="name" />
+        <result column="type" property="type" />
+        <result column="is_open" property="open" />
+        <result column="sort" property="sort" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        is_deleted,
+        creator,
+        modifier,
+        create_time,
+        modify_time,
+        place_id, name, type, is_open, sort
+    </sql>
+
+</mapper>

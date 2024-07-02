@@ -1,0 +1,168 @@
+-- 订单表
+CREATE TABLE `fc_order`
+(
+    `id`                 BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '唯一主键',
+    `order_no`           VARCHAR(64)  NOT NULL COMMENT '订单编码',
+    `parent_order_no`    VARCHAR(64)  NOT NULL COMMENT '父订单编码',
+    `type`               TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '类型(1-实物,2-虚拟,3-团购)',
+    `sub_type`           TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '类型(11-生鲜,12-零食,21-会员卡,22-次卡,29-无商品订单,31-发起人,32-跟团)',
+    `total_amount`       BIGINT(20) DEFAULT 0 COMMENT '订单总金额',
+    `pay_amount`         BIGINT(20) DEFAULT 0 COMMENT '支付金额（实际）',
+    `freight_fee`        BIGINT(20) DEFAULT 0 COMMENT '运费金额',
+    `package_fee `       BIGINT(20) DEFAULT 0 COMMENT '包装费金额',
+    `discount_amount`    BIGINT(20) DEFAULT 0 COMMENT '折扣金额,商铺价格打折',
+    `promotion_amount`   BIGINT(20) DEFAULT 0 COMMENT '促销优化金额（促销价、满减、阶梯价）',
+    `coupon_amount`      BIGINT(20) DEFAULT 0 COMMENT '优惠券抵扣金额',
+    `point_amount`       BIGINT(20) DEFAULT 0 COMMENT '积分抵扣金额',
+    `use_point`          INT(11) UNSIGNED DEFAULT 0 COMMENT '使用积分数',
+    `point`              INT(11) UNSIGNED DEFAULT 0 COMMENT '获取积分数',
+    `channel_type`       TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '渠道类型(1-普通,2-虚拟)',
+    `channel_source`     TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '渠道来源(1-普通,2-虚拟)',
+    `cancel_type`        TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '取消类型(1-用户取消,2-超时取消,3-客服取消,4-异常取消)',
+    `cancel_reason_type` TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '取消原因类型(1-个人原因,2-质量原因,3-优惠原因,4-体验原因)',
+    `status`             TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '订单状态(5-待支付,10-待发货,20-已发货,40-已完成,60-已关闭,90-无效)',
+    `cancel_reason`      VARCHAR(256) NOT NULL COMMENT '取消原因',
+    `remark`             VARCHAR(256) NOT NULL COMMENT '备注',
+    `close_time`         DATETIME    DEFAULT now() COMMENT '关闭时间',
+    `auto_cancel_time`   DATETIME    DEFAULT NULL COMMENT '自动取消时间',
+    `is_main`            TINYINT(1) UNSIGNED DEFAULT 1 COMMENT '是否主订单(1-主订单,2-子订单)',
+    `is_deleted`         TINYINT(1) UNSIGNED DEFAULT 0 COMMENT '删除状态(0-正常,1-删除)',
+    `creator`            VARCHAR(64) DEFAULT NULL COMMENT '创建人',
+    `modifier`           VARCHAR(64) DEFAULT NULL COMMENT '修改人',
+    `create_time`        DATETIME    DEFAULT now() COMMENT '创建时间',
+    `modify_time`        DATETIME    DEFAULT now() COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_order_no` (`order_no`),
+    KEY                  `idx_parent_order_no` (`parent_order_no`),
+    KEY                  `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '订单表';
+
+-- 订单商品表
+CREATE TABLE `fc_order_item`
+(
+    `id`               BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '唯一主键',
+    `order_id`         BIGINT(20) UNSIGNED NOT NULL COMMENT '订单ID',
+    `order_no`         VARCHAR(64) NOT NULL COMMENT '订单编码',
+    `product_id`       BIGINT(20) UNSIGNED NOT NULL COMMENT '商品ID',
+    `product_pic`      VARCHAR(512) COMMENT '商品图片',
+    `product_name`     VARCHAR(256) COMMENT '商品名称',
+    `product_brand`    VARCHAR(256) COMMENT '商品品牌',
+    `product_sn`       VARCHAR(64) COMMENT '商品条码',
+    `origin_price `    BIGINT(20) NOT NULL COMMENT '销售价格',
+    `real_price`       BIGINT(20) NOT NULL COMMENT '优惠后真实价格',
+    `buy_quantity`     INT(11) DEFAULT 1 COMMENT '购买数量',
+    `sku_id`           BIGINT(20) UNSIGNED NOT NULL COMMENT '商品sku编号ID',
+    `sku_code`         VARCHAR(50) NOT NULL COMMENT '商品sku条码',
+    `category_id`      BIGINT(20) UNSIGNED NOT NULL COMMENT '商品分类id',
+    `promotion_name`   VARCHAR(256) COMMENT '商品促销名称',
+    `promotion_amount` BIGINT(20) DEFAULT 0 COMMENT '促销优化金额（促销价、满减、阶梯价）分摊',
+    `coupon_amount`    BIGINT(20) DEFAULT 0 COMMENT '优惠券抵扣金额分摊',
+    `point_amount`     BIGINT(20) DEFAULT 0 COMMENT '积分抵扣金额分摊',
+    `point`            INT(11) UNSIGNED DEFAULT 0 COMMENT '获取积分数',
+    `sp1`              VARCHAR(128) COMMENT '商品的销售属性1',
+    `sp2`              VARCHAR(128) COMMENT '商品的销售属性2',
+    `sp3`              VARCHAR(128) COMMENT '商品的销售属性3',
+    `is_deleted`       TINYINT(1) UNSIGNED DEFAULT 0 COMMENT '删除状态(0-正常,1-删除)',
+    `creator`          VARCHAR(64) DEFAULT NULL COMMENT '创建人',
+    `modifier`         VARCHAR(64) DEFAULT NULL COMMENT '修改人',
+    `create_time`      DATETIME    DEFAULT now() COMMENT '创建时间',
+    `modify_time`      DATETIME    DEFAULT now() COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY                `idx_order_id` (`order_id`),
+    KEY                `idx_order_no` (`order_no`),
+    KEY                `idx_product_id` (`product_id`),
+    KEY                `idx_sku_id` (`sku_id`),
+    KEY                `idx_category_id` (`category_id`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '订单商品表';
+
+-- 物流表
+CREATE TABLE `fc_logistics`
+(
+    `id`                  BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '唯一主键',
+    `logistics_no`        VARCHAR(256) DEFAULT NULL COMMENT '物流单号',
+    `status`              TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '状态(1-待揽件,2-已揽件,3-运输中,4-派送中,6-待取件,9-已签收,99-异常)',
+    `company_code`        VARCHAR(64)  DEFAULT NULL COMMENT '公司编码',
+    `company_name`        VARCHAR(64)  DEFAULT NULL COMMENT '公司名称',
+    `send_time`           DATETIME     DEFAULT NULL COMMENT '配送时间',
+    `arrival_time`        DATETIME     DEFAULT NULL COMMENT '送达时间',
+--     `receiver_address_id` INT(11) UNSIGNED NOT NULL COMMENT '接收人地址id',
+    `province_code`       VARCHAR(32) NOT NULL COMMENT '省份编码',
+    `city_code`           VARCHAR(32) NOT NULL COMMENT '城市编码',
+    `country_code`        VARCHAR(32) NOT NULL COMMENT '国家编码',
+    `area_code`           VARCHAR(32) NOT NULL COMMENT '地区编码',
+    `receiver_province`   VARCHAR(32) NOT NULL COMMENT '省份',
+    `receiver_city`       VARCHAR(32) NOT NULL COMMENT '城市',
+    `receiver_country`    VARCHAR(32) NOT NULL COMMENT '国家',
+    `receiver_area`       VARCHAR(32) NOT NULL COMMENT '地区',
+    `longitude`           VARCHAR(32) NOT NULL COMMENT '经度',
+    `latitude`            VARCHAR(32) NOT NULL COMMENT '纬度',
+    `receiver_phone`      VARCHAR(32) NOT NULL COMMENT '接收人号码',
+    `receiver_name`       VARCHAR(32) NOT NULL COMMENT '接收人名称',
+    `expect_arrival_time` DATETIME     DEFAULT NULL COMMENT '期望送达时间',
+    `send_phone`          VARCHAR(32) NOT NULL COMMENT '发送人号码',
+    `send_name`           VARCHAR(32) NOT NULL COMMENT '发送人名称',
+    `is_deleted`          TINYINT(1) UNSIGNED DEFAULT 0 COMMENT '删除状态(0-正常,1-删除)',
+    `creator`             VARCHAR(64)  DEFAULT NULL COMMENT '创建人',
+    `modifier`            VARCHAR(64)  DEFAULT NULL COMMENT '修改人',
+    `create_time`         DATETIME     DEFAULT now() COMMENT '创建时间',
+    `modify_time`         DATETIME     DEFAULT now() COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_logistics_no` (`logistics_no`),
+    KEY                   `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '物流表';
+
+-- 支付表
+CREATE TABLE `fc_payment`
+(
+    `id`               BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '唯一主键',
+    `out_payment_no`   VARCHAR(128) DEFAULT NULL COMMENT '外部支付编码',
+    `order_id`         BIGINT(20) UNSIGNED NOT NULL COMMENT '订单ID',
+    `order_no`         VARCHAR(64) NOT NULL COMMENT '订单编码',
+    `pay_finish_time`  DATETIME     DEFAULT NULL COMMENT '支付完成时间',
+    `pay_trigger_time` DATETIME     DEFAULT NULL COMMENT '支付发起时间',
+    `amount`           BIGINT(20) UNSIGNED NOT NULL COMMENT '支付金额',
+    `pay_way`          TINYINT(2) UNSIGNED DEFAULT 99 COMMENT '支付方式(1-微信,2-支付宝,3-银联,99-未知)',
+    `status`           TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '支付状态(3-待支付,5-已支付,8-关闭)',
+    `is_deleted`       TINYINT(1) UNSIGNED DEFAULT 0 COMMENT '删除状态(0-正常,1-删除)',
+    `creator`          VARCHAR(64)  DEFAULT NULL COMMENT '创建人',
+    `modifier`         VARCHAR(64)  DEFAULT NULL COMMENT '修改人',
+    `create_time`      DATETIME     DEFAULT now() COMMENT '创建时间',
+    `modify_time`      DATETIME     DEFAULT now() COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY                `idx_out_payment_no` (`out_payment_no`),
+    KEY                `idx_order_id` (`order_id`),
+    KEY                `idx_order_no` (`order_no`),
+    KEY                `idx_pay_way` (`pay_way`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '支付表';
+
+-- 订单流转表
+CREATE TABLE `fc_order_action`
+(
+    `id`            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '唯一主键',
+    `order_id`      BIGINT(20) UNSIGNED NOT NULL COMMENT '订单ID',
+    `origin_status` TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '订单状态(5-待支付,10-待发货,20-已发货,40-已完成,60-已关闭,90-无效)',
+    `target_status` TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '订单状态(5-待支付,10-待发货,20-已发货,40-已完成,60-已关闭,90-无效)',
+    `is_deleted`    TINYINT(1) UNSIGNED DEFAULT 0 COMMENT '删除状态(0-正常,1-删除)',
+    `creator`       VARCHAR(64) DEFAULT NULL COMMENT '创建人',
+    `modifier`      VARCHAR(64) DEFAULT NULL COMMENT '修改人',
+    `create_time`   DATETIME    DEFAULT now() COMMENT '创建时间',
+    `modify_time`   DATETIME    DEFAULT now() COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY             `idx_order_id` (`order_id`),
+    KEY             `idx_origin_status` (`origin_status`),
+    KEY             `idx_target_status` (`target_status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '订单流转表';
+
+-- 会员表 待完善
+CREATE TABLE `fc_member`
+(
+    `id`            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '唯一主键',
+    `order_id`      BIGINT(20) UNSIGNED NOT NULL COMMENT '订单ID',
+    `origin_status` TINYINT(1) UNSIGNED DEFAULT 1 COMMENT '订单状态(5-待支付,10-待发货,20-已发货,40-已完成,60-已关闭,90-无效)',
+    `target_status` TINYINT(1) UNSIGNED DEFAULT 1 COMMENT '订单状态(5-待支付,10-待发货,20-已发货,40-已完成,60-已关闭,90-无效)',
+    `is_deleted`    TINYINT(1) UNSIGNED DEFAULT 1 COMMENT '删除状态(0-正常,1-删除)',
+    `creator`       VARCHAR(64) DEFAULT NULL COMMENT '创建人',
+    `modifier`      VARCHAR(64) DEFAULT NULL COMMENT '修改人',
+    `create_time`   DATETIME    DEFAULT now() COMMENT '创建时间',
+    `modify_time`   DATETIME    DEFAULT now() COMMENT '更新时间',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '会员表';

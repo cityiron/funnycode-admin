@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fc.sport.mapper.BookingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fc.sport.entity.Booking">
+        <result column="id" property="id" />
+        <result column="is_deleted" property="deleted" />
+        <result column="creator" property="creator" />
+        <result column="modifier" property="modifier" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="court_id" property="courtId" />
+        <result column="court_name" property="courtName" />
+        <result column="name" property="name" />
+        <result column="price" property="price" />
+        <result column="day" property="day" />
+        <result column="sort" property="sort" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="user_id" property="userId" />
+        <result column="status" property="status" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        is_deleted,
+        creator,
+        modifier,
+        create_time,
+        modify_time,
+        court_id, court_name, name, price, day, sort, start_time, end_time, user_id, status, remark
+    </sql>
+
+</mapper>
